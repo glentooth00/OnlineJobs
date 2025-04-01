@@ -1,0 +1,33 @@
+/* SweetAlert2 styles (simplified) */
+.swal2-container {
+    z-index: 9999;
+  }
+  
+  .swal2-popup {
+    width: 32px;
+    max-width: 100%;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.2);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  
+  .swal2-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .swal2-content {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .swal2-confirm,
+  .swal2-cancel {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  
