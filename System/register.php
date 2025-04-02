@@ -145,8 +145,19 @@ if (isset($_POST['Register'])) {
 
 					<div class="nav-mini-wrapper">
 						<ul class="nav-mini sign-in">
-							<li><a  href="login.php">login</a></li>
-							<li><a data-toggle="modal" href="#registerModal">register</a></li>
+						<?php
+						if ($user_online == true) {
+						print '
+						    <li><a href="logout.php">logout</a></li>
+							<li><a href="'.$myrole.'">Profile</a></li>';
+							
+						}else{
+						print '
+							<li><a data-toggle="modal" href="#loginModal">Login</a></li>
+							<li><a data-toggle="modal" href="#registerModal">register</a></li>';						
+						}
+						
+						?>
 						</ul>
 					</div>
 				
@@ -156,6 +167,35 @@ if (isset($_POST['Register'])) {
 				
 			</nav>
 	
+			<div id="loginModal" class="modal fade login-box-wrapper" tabindex="-1" style="display: none;" data-backdrop="static" data-keyboard="false" data-replace="true">
+			
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title text-center">Login your account</h4>
+			</div>
+			
+			<div class="modal-body">
+			
+				<div class="row gap-20">
+				
+					<div class="col-sm-6 col-md-6">
+						<a href="loginEmployer.php?p=Employer" class="btn btn-facebook btn-block mb-5-xs">Login as Employer</a>
+					</div>
+					<div class="col-sm-6 col-md-6">
+						<a href="loginEmployee.php?p=Employee" class="btn btn-facebook btn-block mb-5-xs">Login as Employee</a>
+					</div>
+
+				</div>
+			
+			</div>
+			
+			<div class="modal-footer text-center">
+				<button type="button" data-dismiss="modal" class="btn btn-primary btn-inverse">Close</button>
+			</div>
+			
+		</div>
+
+			
 			<div id="registerModal" class="modal fade login-box-wrapper" tabindex="-1" style="display: none;" data-backdrop="static" data-keyboard="false" data-replace="true">
 			
 				<div class="modal-header">
@@ -289,3 +329,30 @@ if (isset($_POST['Register'])) {
 	</div>
 </body>
 </html>
+
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-modalmanager.js"></script>
+<script type="text/javascript" src="js/bootstrap-modal.js"></script>
+<script type="text/javascript" src="js/smoothscroll.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="js/jquery.waypoints.min.js"></script>
+<script type="text/javascript" src="js/wow.min.js"></script>
+<script type="text/javascript" src="js/jquery.slicknav.min.js"></script>
+<script type="text/javascript" src="js/jquery.placeholder.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-tokenfield.js"></script>
+<script type="text/javascript" src="js/typeahead.bundle.min.js"></script>
+<script type="text/javascript" src="js/bootstrap3-wysihtml5.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="js/jquery-filestyle.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-select.js"></script>
+<script type="text/javascript" src="js/ion.rangeSlider.min.js"></script>
+<script type="text/javascript" src="js/handlebars.min.js"></script>
+<script type="text/javascript" src="js/jquery.countimator.js"></script>
+<script type="text/javascript" src="js/jquery.countimator.wheel.js"></script>
+<script type="text/javascript" src="js/slick.min.js"></script>
+<script type="text/javascript" src="js/easy-ticker.js"></script>
+<script type="text/javascript" src="js/jquery.introLoader.min.js"></script>
+<script type="text/javascript" src="js/jquery.responsivegrid.js"></script>
+<script type="text/javascript" src="js/customs.js"></script>

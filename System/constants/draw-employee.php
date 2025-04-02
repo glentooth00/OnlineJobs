@@ -30,6 +30,15 @@
 </div>
 												
 </div>
+
+<div class="col-sm-12 col-md-12">
+
+<div class="form-group"> 
+<label>PWD ID no.</label>
+<input class="form-control" placeholder="Enter your PWD ID no." name="pwdIdno" required type="text"> 
+</div>
+												
+</div>
 												
 <div class="col-sm-12 col-md-12">
 

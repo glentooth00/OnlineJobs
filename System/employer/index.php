@@ -176,6 +176,10 @@ header("location:../");
 										<li class="">
 										<a href="change-password.php"><i class="fa fa-key"></i> Change Password</a>
 										</li>
+										<li class="">
+										<a href="messages.php"><i class="fa fa-commenting" aria-hidden="true"></i>
+										</i>Messages</a>
+										</li>
 			
 										<li>
 											<a href="../company.php?ref=<?php echo "$myid"; ?>"><i class="fa fa-briefcase"></i> Company Overview</a>

@@ -3,7 +3,7 @@
 <?php 
 require '../constants/settings.php'; 
 require 'constants/check-login.php';
-
+echo $myid;
 if ($user_online == "true") {
 if ($myrole == "employee") {
 }else{
@@ -90,7 +90,7 @@ header("location:../");
 							</li>
 							
 							<li>
-								<a href="../job-list.php">Job List</a>
+								<a href="../job-list.php?user_id=<?= $myid; ?>">Job List</a>
 
 							</li>
 							
@@ -189,6 +189,9 @@ header("location:../");
 										</li>
 										<li class="">
 										<a href="change-password.php"><i class="fa fa-key"></i> Change Password</a>
+										</li>
+										<li class="">
+										<a href="message.php"><i class="fa fa-commenting" aria-hidden="true"></i> Message</a>
 										</li>
 										<li>
 											<a href="qualifications.php"><i class="fa fa-trophy"></i> Professional Qualifications</a>

@@ -5,6 +5,8 @@ require 'constants/settings.php';
 require 'constants/check-login.php';
 $fromsearch = false;
 
+$myid = $_GET['user_id'];
+
 if (isset($_GET['search']) && $_GET['search'] == "✓") {
 
 }else{
@@ -435,7 +437,7 @@ $title = "Job List";
 													</div>
 													
 													<div class="col-sm-5 col-md-4">
-														<a target="_blank" href="explore-job.php?jobid=<?php echo $row['job_id']; ?>" class="btn btn-primary">View This Job</a>
+														<a target="_blank" href="explore-job.php?jobid=<?= $row['job_id']; ?>&user_id=<?= $myid; ?>" class="btn btn-primary">View This Job</a>
 													</div>
 													
 												</div>

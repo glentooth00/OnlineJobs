@@ -33,6 +33,7 @@ try {
 	$experience = $row['experience'];
 	$jobdescription = $row['description'];
 	$jobrespo = $row['responsibility'];
+	$job_id = $row['job_id'];
 	$jobreq = $row['requirements'];
 	$closingdate = $row['closing_date'];
 	$opendate = $row['date_posted'];
@@ -81,6 +82,7 @@ $result = $stmt->fetchAll();
     $compname = $row['first_name'];
 	$complogo = $row['avatar'];
 	$compbout = $row['about'];
+	
 	}
 
 					  
@@ -102,6 +104,37 @@ $jobexpired = true;
 }else{
 $jobexpired = false;
 }
+
+
+// if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])) {
+//     $message = $_POST['message'];
+//     $job_id = $_POST['job_id'];
+//     $employee_id = $_POST['employee_id'];
+//     $employer_id = $_POST['employer_id'];
+
+//     // Debugging: Print the values
+//     echo "Message: " . $message;
+//     echo "Job ID: " . $job_id;
+//     echo "Employee ID: " . $employee_id;
+//     echo "Employer ID: " . $employer_id;
+    
+//     // Continue with the insertion
+//     try {
+//         $stmt = $conn->prepare("INSERT INTO tbl_messages (job_id, employee_id, employer_id, message, date_sent) 
+//                                 VALUES (:job_id, :employee_id, :employer_id, :message, NOW())");
+//         $stmt->bindParam(':job_id', $job_id);
+//         $stmt->bindParam(':employee_id', $employee_id);
+//         $stmt->bindParam(':employer_id', $employer_id);
+//         $stmt->bindParam(':message', $message);
+//         $stmt->execute();
+
+//         echo "Message sent successfully!";
+//     } catch (PDOException $e) {
+//         echo "Error: " . $e->getMessage();
+//     }
+// }
+
+
 ?>
 
 
@@ -241,9 +274,10 @@ $jobexpired = false;
 						print '
 						    <li><a href="logout.php">logout</a></li>
 							<li><a href="'.$myrole.'">Profile</a></li>';
+							
 						}else{
 						print '
-							<li><a href="login.php">login</a></li>
+							<li><a data-toggle="modal" href="#loginModal">Login</a></li>
 							<li><a data-toggle="modal" href="#registerModal">register</a></li>';						
 						}
 						
@@ -258,8 +292,35 @@ $jobexpired = false;
 				
 			</nav>
 
+			<div id="loginModal" class="modal fade login-box-wrapper" tabindex="-1" style="display: none;" data-backdrop="static" data-keyboard="false" data-replace="true">
 			
-		</header>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title text-center">Login your account</h4>
+			</div>
+			
+			<div class="modal-body">
+			
+				<div class="row gap-20">
+				
+					<div class="col-sm-6 col-md-6">
+						<a href="loginEmployer.php?p=Employer" class="btn btn-facebook btn-block mb-5-xs">Login as Employer</a>
+					</div>
+					<div class="col-sm-6 col-md-6">
+						<a href="loginEmployee.php?p=Employee" class="btn btn-facebook btn-block mb-5-xs">Login as Employee</a>
+					</div>
+
+				</div>
+			
+			</div>
+			
+			<div class="modal-footer text-center">
+				<button type="button" data-dismiss="modal" class="btn btn-primary btn-inverse">Close</button>
+			</div>
+			
+		</div>
+
+			
 			<div id="registerModal" class="modal fade login-box-wrapper" tabindex="-1" style="display: none;" data-backdrop="static" data-keyboard="false" data-replace="true">
 			
 				<div class="modal-header">
@@ -287,6 +348,11 @@ $jobexpired = false;
 				</div>
 				
 			</div>
+
+			
+		</header>
+
+
 		<div class="main-wrapper">
 		
 			<div class="breadcrumb-wrapper">
@@ -356,7 +422,7 @@ $jobexpired = false;
 										?>
 									</div>
 									
-									<p><?php echo "$compbout"; ?></p>
+									<p><?php echo "$compbout"; ?> </p>
 									
 								</div>
 								
@@ -377,7 +443,7 @@ $jobexpired = false;
 								</div>
 								
 								<div class="apply-job-wrapper">
-								<?php
+								<!-- <?php
 						        if ($user_online == true) {
 								if ($jobexpired == true) {
 								print '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed"><i class="flaticon-line-icon-set-calendar"></i> This job is expired</button>';
@@ -392,11 +458,93 @@ $jobexpired = false;
 								
 								}else{
 									
-								print '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed"><i class="flaticon-line-icon-set-padlock"></i> Login to apply this job</button>';	
+								print '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed float-end"><i class="flaticon-line-icon-set-padlock"></i> Login to apply this job</button>';	
 								}
 								
-								?>
-								
+								?> -->
+
+<?php
+
+$myid = $_GET['user_id'];
+
+if ($user_online || $jobexpired) {
+    if ($jobexpired) {
+        echo '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed mt-5 float-start w-100">
+                <i class="flaticon-line-icon-set-calendar"></i> This job is expired
+              </button>';
+    } elseif ($myrole === "employee") {
+        echo '<button onclick="update(this.value)" value="'.$jobid.'" class="btn btn-primary btn-hidden btn-lg collapsed mt-5 float-start w-100">
+                <i class="flaticon-line-icon-set-pencil"></i> Apply for this job
+              </button>';
+    } else {
+        echo '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed mt-5 float-start w-100">
+                <i class="flaticon-line-icon-set-padlock"></i> Login as employee to apply
+              </button>';
+    }
+    
+    // Enable messaging the employer
+    if ($myrole === "employee") {
+		echo '<button class="btn btn-primary btn-hidden btn-lg collapsed mt-5 float-start w-100" style="width:18em;margin-left:-.1em;" 
+		data-jobid="'.$jobid.'" data-myid="'.$myid.'" data-compid="'.$compid.'" 
+		onclick="openMessageModal(this)">
+		<i class="flaticon-line-icon-set-pencil"></i> Message Employer
+	  </button>';
+    } else {
+        echo '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed mt-5 float-start w-100">
+                <i class="flaticon-line-icon-set-padlock"></i> Login as employee to send Message
+              </button>';
+    }
+} else {
+    echo '<button class="btn btn-primary disabled btn-hidden btn-lg collapsed mt-5 float-start w-100">
+            <i class="flaticon-line-icon-set-padlock"></i> Login to Message Employer
+          </button>';
+} 
+?>
+
+
+<!-- Custom Message Modal -->
+<div id="customMessageModal" class="custom-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; box-shadow:0px 0px 10px rgba(0,0,0,0.3); width: 400px;">
+    <h5>Send Message to Employer</h5>
+    <form id="messageForm" action="message.php" method="post">
+        <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+        </div>
+        <input type="text" id="employer_id" name="employer_id" value="">
+        <input type="text" id="employee_id" name="employee_id" value="">
+        <input type="text" id="job_id" name="job_id" value="">
+        <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Close</button>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+</div>
+
+
+<script>
+function openMessageModal(button) {
+    // Get the values from the button's data attributes
+    var jobId = button.getAttribute('data-jobid');
+    var myId = button.getAttribute('data-myid');
+    var compId = button.getAttribute('data-compid');
+
+    // Set these values in the modal's input fields
+    document.getElementById('job_id').value = jobId;
+    document.getElementById('employee_id').value = myId;
+    document.getElementById('employer_id').value = compId;
+
+    // Show the modal
+    document.getElementById('customMessageModal').style.display = 'block';
+}
+
+function closeMessageModal() {
+    // Hide the modal
+    document.getElementById('customMessageModal').style.display = 'none';
+}
+</script>
+
+
+
+
+							
 								<p id="data"></p>
 
 								</div>
