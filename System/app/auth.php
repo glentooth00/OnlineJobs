@@ -35,6 +35,7 @@ try {
             $_SESSION['mydesc'] = $row['about'];
             $_SESSION['avatar'] = $row['avatar'];
             $_SESSION['lastlogin'] = $row['last_login'];
+            $_SESSION['gender'] = $row['gender'];
 
             if ($role == "employee") {
                 $_SESSION['myfname'] = $row['first_name'];
@@ -44,6 +45,7 @@ try {
                 $_SESSION['myyear'] = $row['byear'];
                 $_SESSION['myedu'] = $row['education'];
                 $_SESSION['mytitle'] = $row['title'];
+                $_SESSION['gender'] = $row['gender'];
             } else {
                 $_SESSION['compname'] = $row['first_name'];
                 $_SESSION['established'] = $row['byear'];
@@ -52,6 +54,7 @@ try {
                 $_SESSION['myexp'] = $row['expertise'];
                 $_SESSION['website'] = $row['website'];
                 $_SESSION['people'] = $row['people'];
+                $_SESSION['gender'] = $row['gender'];
             }
 
             // Update last login

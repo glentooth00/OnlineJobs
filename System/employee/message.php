@@ -3,6 +3,7 @@
 <?php 
 require '../constants/settings.php'; 
 require 'constants/check-login.php';
+require '../constants/db_config.php'; 
 echo $myid;
 if ($user_online == "true") {
 if ($myrole == "employee") {
@@ -230,32 +231,121 @@ header("location:../");
 							<div class="GridLex-col-9_sm-8_xs-12">
 							
                             <div class="admin-content-wrapper">
-    <div class="admin-section-title">
-        <h2>Messages from Employers</h2>
-    </div>
+							<div class="admin-section-title">
+								<h2>Messages from Employers</h2>
+							</div>
 
-    <div class="messages-list">
-        <div class="message-item">
+							<div class="messages-list">
+							<?php 
+    $myid; 
+
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $messages = "SELECT * FROM tbl_messages WHERE employee_id = :myid ORDER BY created_at DESC";
+    $stmt = $conn->prepare($messages);
+    $stmt->bindParam(':myid', $myid);
+    $stmt->execute();
+
+    $messages_count = $stmt->rowCount();
+    $messages_per_page = 5;
+
+	function time_elapsed_string($datetime, $full = false) {
+		$now = new DateTime;
+		$ago = new DateTime($datetime);
+		$diff = $now->diff($ago);
+	
+		// Use a local variable instead of dynamically adding $w to $diff
+		$weeks = floor($diff->d / 7);
+		$diff->d -= $weeks * 7;
+	
+		$string = [
+			'y' => 'year', 'm' => 'month', 'd' => 'day',
+			'h' => 'hour', 'i' => 'minute', 's' => 'second',
+		];
+	
+		// Add weeks manually to the string
+		if ($weeks > 0) {
+			$string = ['w' => $weeks] + $string;
+		}
+	
+		foreach ($string as $k => &$v) {
+			if (is_numeric($v)) {
+				$v = $v . ' ' . $k . ($v > 1 ? 's' : '');
+			} elseif ($diff->$k) {
+				$v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+			} else {
+				unset($string[$k]);
+			}
+		}
+	
+		if (!$full) $string = array_slice($string, 0, 1);
+		return $string ? implode(', ', $string) . ' ago' : 'just now';
+	}
+	
+?>
+
+<?php if ($messages_count > 0): ?>
+    <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+        <div class="message-item" style="margin-bottom:20px;">
             <div class="message-header">
-                <strong>Employer Name</strong> <span class="text-muted">- 2 hours ago</span>
+                <strong>
+					<!-- <?= htmlspecialchars($row['employer_id'] ?? 'Employer') ?>
+					 -->
+					<?php 
+						$employer_id = $row['employer_id']; 
+
+						$sql = "select first_name from tbl_users where member_no = :employer_id";
+						$stmt = $conn->prepare($sql);
+						$stmt->bindParam(':employer_id', $employer_id);
+						$stmt->execute();
+						
+						$employer_name = $stmt->fetch(PDO::FETCH_ASSOC);
+
+						$employer_firstname = $employer_name['first_name'];
+
+					?>
+					<?= $employer_firstname ?>
+				</strong>
+                <span class="text-muted">- <?= time_elapsed_string($row['created_at']) ?></span>
             </div>
-            <div class="message-body">
-                <p>Hello, we would like to discuss your recent application...</p>
-            </div>
-            <button class="btn btn-primary btn-reply" data-toggle="modal" data-target="#chatModal">Reply</button>
-        </div>
-        <hr>
-        <div class="message-item">
-            <div class="message-header">
-                <strong>Another Employer</strong> <span class="text-muted">- Yesterday</span>
-            </div>
-            <div class="message-body">
-                <p>We have an interview scheduled for you tomorrow...</p>
-            </div>
-            <button class="btn btn-primary btn-reply" data-toggle="modal" data-target="#chatModal">Reply</button>
-        </div>
-    </div>
+            <div class="message-body mb-5">
+    <?php
+    $messageText = '';
+
+    // Try decoding both message_employer and message_employee
+    if (!empty($row['message_employer'])) {
+        $messageData = json_decode($row['message_employer'], true);
+        $messageText = $messageData['message'] ?? '';
+    } elseif (!empty($row['message_employee'])) {
+        $messageData = json_decode($row['message_employee'], true);
+        $messageText = $messageData['message'] ?? '';
+    }
+    ?>
+    <p><?= nl2br(htmlspecialchars($messageText)) ?></p>
 </div>
+
+            <button class="btn btn-primary btn-reply" data-toggle="modal" data-target="#chatModal">Reply</button>
+        </div>
+    <?php endwhile; ?>
+<?php else: ?>
+    <p>No messages found.</p>
+<?php endif; ?>
+
+
+
+								<hr>
+								<!-- <div class="message-item">
+									<div class="message-header">
+										<strong>Another Employer</strong> <span class="text-muted">- Yesterday</span>
+									</div>
+									<div class="message-body">
+										<p>We have an interview scheduled for you tomorrow...</p>
+									</div>
+									<button class="btn btn-primary btn-reply" data-toggle="modal" data-target="#chatModal">Reply</button>
+								</div> -->
+							</div>
+						</div>
 
 <!-- Chat Modal -->
 <div id="chatModal" class="modal fade" tabindex="-1" role="dialog">
@@ -268,28 +358,127 @@ header("location:../");
                 </button>
             </div>
             <div class="modal-body">
-                <div class="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px;">
-                    <div class="chat-message employer">
-                        <strong>Employer:</strong>
-                        <p>Hi, are you available for an interview tomorrow?</p>
-                    </div>
-                    <div class="chat-message employee">
-                        <strong>You:</strong>
-                        <p>Yes, I am available. What time?</p>
-                    </div>
+                <!-- Scrollable Chat Box -->
+                <div class="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+                    <?php
+                    $chat_sql = "SELECT * FROM tbl_messages WHERE employee_id = :myid ORDER BY created_at ASC";
+                    $chat_stmt = $conn->prepare($chat_sql);
+                    $chat_stmt->bindParam(':myid', $myid);
+                    $chat_stmt->execute();
+
+                    while ($chat = $chat_stmt->fetch(PDO::FETCH_ASSOC)):
+
+                        $employeeMsg = !empty($chat['message_employee']) ? json_decode($chat['message_employee'], true) : null;
+                        $employerMsg = !empty($chat['message_employer']) ? json_decode($chat['message_employer'], true) : null;
+
+                        // Display employer message if it exists
+                        if (!empty($employerMsg['message'])):
+                            ?>
+                            <div class="chat-message text-left" style="margin-bottom: 10px;">
+                                <div style="display: inline-block; max-width: 70%; background: #e2f0d9; padding: 10px; border-radius: 10px;">
+                                    <p style="margin: 0;"><?= nl2br(htmlspecialchars($employerMsg['message'])) ?></p>
+                                    <small class="text-muted"><?= date('m/d/Y h:i A', strtotime($chat['created_at'])) ?></small>
+                                </div>
+                            </div>
+                        <?php
+                        endif;
+
+                        // Display employee message if it exists
+                        if (!empty($employeeMsg['message'])):
+                            ?>
+                            <div class="chat-message text-right" style="margin-bottom: 10px;">
+                                <div style="display: inline-block; max-width: 100%; background: #d9edf7; padding: 20px; border-radius: 10px;">
+                                    <p style="margin: 0;"><strong>
+                                        <?php if($chat['employee_id']) :?>
+                                            Me :
+                                        <?php endif; ?>
+                                        <br>
+                                    </strong> <?= nl2br(htmlspecialchars($employeeMsg['message'])) ?></p>
+                                    <small class="text-muted"><?= date('m/d/Y h:i A', strtotime($chat['created_at'])) ?></small>
+                                </div>
+                            </div>
+                        <?php
+                        endif;
+
+                    endwhile;
+                    ?>
                 </div>
+
+                <!-- Input Box -->
                 <div class="message-input mt-3">
-                    <textarea class="form-control" rows="3" placeholder="Type your message..."></textarea>
+                    <form action="message.php" method="post">
+                        <textarea class="form-control" name="message" rows="3" placeholder="Type your message..." style="width: 470px;"></textarea>
+
+                        <?php 
+                        $chat_stmt = $conn->prepare("SELECT * FROM tbl_messages WHERE employee_id = :myid ORDER BY created_at ASC");
+                        $chat_stmt->bindParam(':myid', $myid);
+                        $chat_stmt->execute();
+                        $result = $chat_stmt->fetch(PDO::FETCH_ASSOC);
+                        ?>
+
+                        <input type="hidden" name="employee_id" value="<?= $result['employee_id'] ?>">
+                        <input type="hidden" name="employer_id" value="<?= $result['employer_id'] ?>">
+                        <input type="hidden" name="job_id" value="<?= $result['job_id'] ?>">
                 </div>
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Send</button>
+                <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
+<?php 
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $user = "Employee";
+    $message = $_POST['message'];
+    $job_id = $_POST["job_id"];
+    $employee_id = $_POST["employee_id"];
+    $employer_id = $_POST["employer_id"];
+
+    // Convert array to JSON string
+    $message_employee = json_encode([
+        'user' => $user,
+        'message' => $message,
+    ]);
+
+    $message_employer = null; // or set to json_encode([]) if needed
+
+    date_default_timezone_set('Asia/Manila');
+    $now = date('Y-m-d H:i:s');
+
+    $sql = "INSERT INTO tbl_messages 
+        (job_id, employee_id, employer_id, message_employee, message_employer, created_at, updated_at) 
+        VALUES (:job_id, :employee_id, :employer_id, :message_employee, :message_employer, :created_at, :updated_at)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bindParam(':job_id', $job_id, PDO::PARAM_STR);
+    $stmt->bindParam(':employee_id', $employee_id, PDO::PARAM_STR);
+    $stmt->bindParam(':employer_id', $employer_id, PDO::PARAM_STR);
+    $stmt->bindParam(':message_employee', $message_employee, PDO::PARAM_STR);
+    $stmt->bindParam(':message_employer', $message_employer, PDO::PARAM_STR);
+    $stmt->bindParam(':created_at', $now, PDO::PARAM_STR);
+    $stmt->bindParam(':updated_at', $now, PDO::PARAM_STR);
+
+    if ($stmt->execute()) {
+        echo "<script>
+                alert('Message saved successfully!');
+                window.history.back();
+              </script>";
+        exit;
+    } else {
+        echo "Error: " . $stmt->errorInfo()[2];
+    }
+}
+
+
+?>
 
 <style>
     .messages-container {
@@ -321,7 +510,33 @@ header("location:../");
     .btn {
         margin-right: 10px;
     }
+
+    /* Additional chat styles */
+    .chat-message {
+        margin-bottom: 15px;
+    }
+
+    .chat-message.employer {
+        text-align: left;
+    }
+
+    .chat-message.employee {
+        text-align: right;
+    }
+
+    .chat-message p {
+        margin: 5px 0;
+    }
+	.chat-box{
+		height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #f9f9f9;
+    width: 82.5%;
+	}
 </style>
+
 
 
 							</div>

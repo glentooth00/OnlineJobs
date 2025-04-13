@@ -3,7 +3,7 @@
 <?php 
 require '../constants/settings.php'; 
 require 'constants/check-login.php';
-echo $myid;
+$myid;
 if ($user_online == "true") {
 if ($myrole == "employee") {
 }else{

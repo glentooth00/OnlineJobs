@@ -510,9 +510,10 @@ if ($user_online || $jobexpired) {
             <label for="message" class="form-label">Message</label>
             <textarea class="form-control" id="message" name="message" rows="3"></textarea>
         </div>
-        <input type="text" id="employer_id" name="employer_id" value="">
-        <input type="text" id="employee_id" name="employee_id" value="">
-        <input type="text" id="job_id" name="job_id" value="">
+        <input type="hidden" id="employer_id" name="employer_id" value="">
+        <input type="hidden" id="employee_id" name="employee_id" value="">
+        <input type="hidden" id="job_id" name="job_id" value="">
+		<hr class="mb-2">
         <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Close</button>
         <button type="submit" class="btn btn-primary">Send Message</button>
     </form>

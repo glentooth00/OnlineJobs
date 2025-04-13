@@ -24,30 +24,28 @@ $mypass = md5($_POST['password']);
     foreach($result as $row)
     {
 	$role = $row['role'];
-	if ($role == "employee") {
+	if ($role == "employer") {
 	session_start();
-    $_SESSION['logged'] = true;
-    $_SESSION['myid'] = $row['member_no'];
-    $_SESSION['myfname'] = $row['first_name'];
-	$_SESSION['mylname'] = $row['last_name'];
+    $_SESSION['logged'] = true;	
+	$_SESSION['myid'] = $row['member_no'];
+	$_SESSION['first_name'] = $row['first_name'];
+	$_SESSION['last_name'] = $row['last_name'];
+    $_SESSION['compname'] = $row['first_name'];
+	$_SESSION['established'] = $row['byear'];
     $_SESSION['myemail'] = $row['email'];
-	$_SESSION['mydate'] = $row['bdate'];
-	$_SESSION['mymonth'] = $row['bmonth'];
-	$_SESSION['myyear'] = $row['byear'];
     $_SESSION['myphone'] = $row['phone'];
-	$_SESSION['myedu'] = $row['education'];
-	$_SESSION['mytitle'] = $row['title'];
+	$_SESSION['comptype'] = $row['title'];
 	$_SESSION['mycity'] = $row['city'];
 	$_SESSION['mystreet'] = $row['street'];
 	$_SESSION['myzip'] = $row['zip'];
     $_SESSION['mycountry'] = $row['country'];
     $_SESSION['mydesc'] = $row['about'];
-
-
 	$_SESSION['avatar'] = $row['avatar'];
+	$_SESSION['myserv'] = $row['services'];
+	$_SESSION['myexp'] = $row['expertise'];
 	$_SESSION['lastlogin'] = $row['last_login'];
-	$_SESSION['avatar'] = $row['avatar'];
-	$_SESSION['gender'] = $row['avatar'];
+	$_SESSION['website'] = $row['website'];
+	$_SESSION['people'] = $row['people'];
 	$_SESSION['role'] = $role;
 	
 	}else{
